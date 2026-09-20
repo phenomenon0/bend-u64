@@ -4,18 +4,18 @@
 arithmetic, and a machine-checked commutation law at width 64. No FFI, no
 hardware intrinsics, no `unsafe`, no compiler change.
 
+**Published on BendHub: [`0x464866dd0fbd191e9b4adc04f0fb781f`](https://hub.bend-lang.com/0x464866dd0fbd191e9b4adc04f0fb781f)** (2 files, 5,146 bytes).
+
 ```bend
 import Base
-import ./u64.bend as U64
+import 0x464866dd0fbd191e9b4adc04f0fb781f/package.bend as U64   # law-checked entry
+# or: 0x464866dd0fbd191e9b4adc04f0fb781f/u64.bend as U64        # implementation only
 
 def main() -> IO(Unit):
   do IO<Unit>:
     x : U64.U64 = U64.max()
     y : U64.U64 = U64.inc(x)          # wraps to 0: all 64 bits participate
-    u : Unit <- IO.print(String.append(
-      match U64.is_eq(y, U64.zero())
-        case True{}: "wrap ok"
-        case False{}: "wrap FAIL", "\n"))
+    u : Unit <- IO.print("wrapped\n")
     IO.print("done\n")
 ```
 
@@ -36,6 +36,8 @@ type U64 is Data:
   same theorem `U32` uses at 32, no new induction.
 - All arithmetic is width-64 `Word.*`; carry propagates through all 64 bits
   (`(2^64-1)+1 == 0`, `(2^32)^2 == 0 mod 2^64`).
+- Round-trip verified: a clean import of the hash above runs
+  `HUB-OK: max+1 wraps to 0` on the interpreter **and** the compiled C backend.
 
 ## Honest boundaries
 
@@ -56,18 +58,19 @@ is_eq is_lt is_gt to_nat`
 ## Verify
 
 ```sh
-./verify.sh          # strict check (laws) + interpret + JS + C + a proof mutation
+./verify.sh          # strict check (laws, no holes) + interpret + JS + C + a proof mutation
 ```
 
 The mutation step proves the law's witness is load-bearing: corrupting the
 implementation makes the bundle refuse to check.
 
-## BendHub
+## Publishing an update
 
 ```sh
 bend package.bend --publish
 ```
 
-Publishing prints a content hash; import the package as
-`import 0x<hash>/package.bend as U64` (proof-checked entry) or
-`import 0x<hash>/u64.bend as U64` (implementation only).
+A source change produces a new package hash; update import lines accordingly.
+A native `U64` in Base would make this package obsolete — and it would be a
+small change: the same `Word(64n)` machinery plus integer op tables, in the
+exact shape `F64` already ships.
