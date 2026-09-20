@@ -55,6 +55,25 @@ type U64 is Data:
 `zero one max add sub mul inc and or xor not shl shr shl_n shr_n cmp
 is_eq is_lt is_gt to_nat`
 
+## Performance (measured — the honest number)
+
+10,000,000 incrementing adds, same program, Ryzen 7 7700X, Bend 2.0.17:
+
+| lane | time | per op |
+|---|---:|---:|
+| native C control (`unsigned long long`) | ~2 ms | sub-nanosecond (loop collapses under -O2) |
+| Bend interpreter | 1.35 s | ~135 ns |
+| Bend → C, `-O2` | 2.2 s | ~220 ns |
+
+**Slow, and worth saying plainly:** the compiler lowers width-32 through native
+op tables (`u32_*`) and `F64` through its own ops, but width-64 generic
+`Word.*` compiles to the structural bit-at-a-time walk — so a compiled `U64`
+op costs about what an interpreted one costs, ~10²–10³× the native control.
+Use it for cold paths (IDs, occasional arithmetic, the proof story) today; for
+hot loops use pairs of `U32` with manual carry — or wait for a native
+`Word(64n)` lowering, which is mechanical: mirror the `F64` op tables in the
+compiler. This package is the working spec — and the benchmark — for that change.
+
 ## Verify
 
 ```sh
