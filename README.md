@@ -4,12 +4,13 @@
 arithmetic, and a machine-checked commutation law at width 64. No FFI, no
 hardware intrinsics, no `unsafe`, no compiler change.
 
-**Published on BendHub: [`0x464866dd0fbd191e9b4adc04f0fb781f`](https://hub.bend-lang.com/0x464866dd0fbd191e9b4adc04f0fb781f)** (2 files, 5,146 bytes).
+**Published on BendHub: [`0x0f1da4e80677f1d50e6f638a7d6f27ef`](https://hub.bend-lang.com/0x0f1da4e80677f1d50e6f638a7d6f27ef)** (2 files, 5,518 bytes).
 
 ```bend
 import Base
-import 0x464866dd0fbd191e9b4adc04f0fb781f/package.bend as U64   # law-checked entry
-# or: 0x464866dd0fbd191e9b4adc04f0fb781f/u64.bend as U64        # implementation only
+import 0x0f1da4e80677f1d50e6f638a7d6f27ef/u64.bend as U64       # the implementation (type + ops)
+# note: the package.bend facade re-exports the functions only; to NAME the type
+# U64.U64 in annotations, import u64.bend directly, as above.
 
 def main() -> IO(Unit):
   do IO<Unit>:

@@ -7,6 +7,12 @@
 # `Word.*` layer. The commutation law is instantiated from Base's own generic
 # inductive lemma `Word.add_comm(64n, ...)` — the same theorem U32 uses at 32.
 #
+# Speed: every operation walks the generic Word(64n) layer, so on hot loops
+# expect reference-grade times (bench: ~10^2-10^3x a native 64-bit control;
+# numbers in the repo README). A native word-64 lowering turns the SAME
+# semantics into machine-speed ops — merged in the omen fork, proposed
+# upstream. Intended today for cold paths: IDs, occasional math, proofs.
+#
 # Boundaries, stated honestly:
 #   - `to_nat` is valid while the value fits a Nat immediate (<= 2^48-1);
 #     wider values are legal U64s and compare in word space (`cmp`/`is_*`).
